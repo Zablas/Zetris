@@ -1,5 +1,6 @@
 const std = @import("std");
 const rl = @import("raylib");
+const constants = @import("constants");
 
 pub const Grid = struct {
     grid: [20][10]usize,
@@ -11,16 +12,7 @@ pub const Grid = struct {
     pub fn init() Grid {
         return Grid{
             .grid = [_][10]usize{[_]usize{0} ** 10} ** 20,
-            .colors = [8]rl.Color{
-                .{ .r = 26, .g = 31, .b = 40, .a = 255 },
-                .{ .r = 47, .g = 230, .b = 23, .a = 255 },
-                .{ .r = 232, .g = 18, .b = 18, .a = 255 },
-                .{ .r = 226, .g = 116, .b = 17, .a = 255 },
-                .{ .r = 237, .g = 234, .b = 4, .a = 255 },
-                .{ .r = 166, .g = 0, .b = 247, .a = 255 },
-                .{ .r = 21, .g = 204, .b = 209, .a = 255 },
-                .{ .r = 13, .g = 64, .b = 216, .a = 255 },
-            },
+            .colors = constants.colors.getAllColors(),
         };
     }
 
