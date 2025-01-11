@@ -33,6 +33,8 @@ pub const TBlock = struct {
             .{ .row = 2, .column = 1 },
         });
 
+        base.move(0, 3);
+
         return TBlock{
             .base = base,
         };

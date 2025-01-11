@@ -15,6 +15,8 @@ pub const OBlock = struct {
             .{ .row = 1, .column = 1 },
         });
 
+        base.move(0, 4);
+
         return OBlock{
             .base = base,
         };

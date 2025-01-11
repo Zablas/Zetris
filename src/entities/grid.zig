@@ -42,4 +42,8 @@ pub const Grid = struct {
             try writer.print("\n", .{});
         }
     }
+
+    pub fn isCellOutside(self: Grid, row: i32, column: i32) bool {
+        return !(row >= 0 and row < self.rows and column >= 0 and column < self.cols);
+    }
 };

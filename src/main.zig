@@ -12,22 +12,19 @@ pub fn main() !void {
     rl.setTargetFPS(60);
     rl.setExitKey(rl.KeyboardKey.null);
 
-    const grid = entities.Grid.init();
-    try grid.print();
-
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
-    var tblock = try entities.TBlock.init(allocator);
-    defer tblock.base.deinit();
+    var game = try entities.Game.init(allocator);
+    defer game.deinit();
 
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
         defer rl.endDrawing();
 
         rl.clearBackground(colors.dark_blue);
-        grid.draw();
-        tblock.base.draw();
+        game.draw();
+        game.handleInput();
     }
 }

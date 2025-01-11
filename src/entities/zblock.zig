@@ -33,6 +33,8 @@ pub const ZBlock = struct {
             .{ .row = 2, .column = 0 },
         });
 
+        base.move(0, 3);
+
         return ZBlock{
             .base = base,
         };

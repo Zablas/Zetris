@@ -11,7 +11,7 @@ pub const IBlock = struct {
         try base.cells.put(0, [4]position.Position{
             .{ .row = 1, .column = 0 },
             .{ .row = 1, .column = 1 },
-            .{ .row = 1, .column = 1 },
+            .{ .row = 1, .column = 2 },
             .{ .row = 1, .column = 3 },
         });
         try base.cells.put(1, [4]position.Position{
@@ -32,6 +32,8 @@ pub const IBlock = struct {
             .{ .row = 2, .column = 1 },
             .{ .row = 3, .column = 1 },
         });
+
+        base.move(-1, 3);
 
         return IBlock{
             .base = base,

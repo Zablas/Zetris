@@ -24,3 +24,6 @@ pub const TBlock = tblock.TBlock;
 
 const zblock = @import("zblock.zig");
 pub const ZBlock = zblock.ZBlock;
+
+const game = @import("game.zig");
+pub const Game = game.Game;
