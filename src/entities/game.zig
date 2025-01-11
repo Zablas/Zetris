@@ -11,12 +11,20 @@ const sblock = @import("sblock.zig");
 const tblock = @import("tblock.zig");
 const zblock = @import("zblock.zig");
 
+const BlockMoveState = enum {
+    Normal,
+    FastFalling,
+    PrevFastFall,
+};
+
 pub const Game = struct {
     game_grid: grid.Grid,
     blocks: std.ArrayList(block.Block),
     current_block: block.Block = undefined,
     next_block: block.Block = undefined,
     allocator: std.mem.Allocator,
+    is_game_over: bool = false,
+    block_move_state: BlockMoveState = .Normal,
 
     pub fn init(allocator: std.mem.Allocator) !Game {
         var game = Game{
@@ -86,16 +94,45 @@ pub const Game = struct {
     }
 
     pub fn handleInput(self: *Game) !void {
-        switch (rl.getKeyPressed()) {
+        const key_pressed = rl.getKeyPressed();
+        if (self.is_game_over and key_pressed != rl.KeyboardKey.null) {
+            try self.reset();
+            return;
+        }
+
+        switch (key_pressed) {
             .left => self.moveBlockLeft(),
             .right => self.moveBlockRight(),
-            .down => try self.moveBlockDown(),
             .up => self.rotateBlock(),
             else => {},
         }
+
+        if (rl.isKeyReleased(rl.KeyboardKey.down)) {
+            self.block_move_state = .Normal;
+        }
+
+        if (self.block_move_state != .PrevFastFall and rl.isKeyDown(rl.KeyboardKey.down)) {
+            self.block_move_state = .FastFalling;
+            try self.moveBlockDown();
+        }
+    }
+
+    fn reset(self: *Game) !void {
+        self.deinit();
+
+        self.is_game_over = false;
+        self.block_move_state = .Normal;
+        self.game_grid = grid.Grid.init();
+        self.blocks = try getAllBlocks(self.allocator);
+        self.current_block = try self.getRandomBlock();
+        self.next_block = try self.getRandomBlock();
     }
 
     fn moveBlockLeft(self: *Game) void {
+        if (self.is_game_over) {
+            return;
+        }
+
         self.current_block.move(0, -1);
         if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.move(0, 1);
@@ -103,6 +140,10 @@ pub const Game = struct {
     }
 
     fn moveBlockRight(self: *Game) void {
+        if (self.is_game_over) {
+            return;
+        }
+
         self.current_block.move(0, 1);
         if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.move(0, -1);
@@ -110,6 +151,10 @@ pub const Game = struct {
     }
 
     pub fn moveBlockDown(self: *Game) !void {
+        if (self.is_game_over) {
+            return;
+        }
+
         self.current_block.move(1, 0);
         if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.move(-1, 0);
@@ -129,6 +174,10 @@ pub const Game = struct {
     }
 
     fn rotateBlock(self: *Game) void {
+        if (self.is_game_over) {
+            return;
+        }
+
         self.current_block.rotate();
         if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.undoRotation();
@@ -143,8 +192,13 @@ pub const Game = struct {
 
         self.current_block.deinit();
         self.current_block = try self.next_block.clone();
+        self.is_game_over = !self.blockFits();
         self.next_block.deinit();
         self.next_block = try self.getRandomBlock();
+
+        if (self.block_move_state == .FastFalling) {
+            self.block_move_state = .PrevFastFall;
+        }
 
         _ = self.game_grid.clearFullRows();
     }
