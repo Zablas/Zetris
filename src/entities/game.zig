@@ -85,11 +85,11 @@ pub const Game = struct {
         self.current_block.draw();
     }
 
-    pub fn handleInput(self: *Game) void {
+    pub fn handleInput(self: *Game) !void {
         switch (rl.getKeyPressed()) {
             .left => self.moveBlockLeft(),
             .right => self.moveBlockRight(),
-            .down => self.moveBlockDown(),
+            .down => try self.moveBlockDown(),
             .up => self.rotateBlock(),
             else => {},
         }
@@ -97,22 +97,23 @@ pub const Game = struct {
 
     fn moveBlockLeft(self: *Game) void {
         self.current_block.move(0, -1);
-        if (self.isBlockOutside()) {
+        if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.move(0, 1);
         }
     }
 
     fn moveBlockRight(self: *Game) void {
         self.current_block.move(0, 1);
-        if (self.isBlockOutside()) {
+        if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.move(0, -1);
         }
     }
 
-    fn moveBlockDown(self: *Game) void {
+    pub fn moveBlockDown(self: *Game) !void {
         self.current_block.move(1, 0);
-        if (self.isBlockOutside()) {
+        if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.move(-1, 0);
+            try self.lockBlock();
         }
     }
 
@@ -123,13 +124,37 @@ pub const Game = struct {
                 return true;
             }
         }
+
         return false;
     }
 
     fn rotateBlock(self: *Game) void {
         self.current_block.rotate();
-        if (self.isBlockOutside()) {
+        if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.undoRotation();
         }
+    }
+
+    fn lockBlock(self: *Game) !void {
+        const tiles = self.current_block.getCellPositions();
+        for (tiles) |tile| {
+            self.game_grid.grid[@intCast(tile.row)][@intCast(tile.column)] = self.current_block.id;
+        }
+
+        self.current_block.deinit();
+        self.current_block = try self.next_block.clone();
+        self.next_block.deinit();
+        self.next_block = try self.getRandomBlock();
+    }
+
+    fn blockFits(self: Game) bool {
+        const tiles = self.current_block.getCellPositions();
+        for (tiles) |tile| {
+            if (!self.game_grid.isCellEmpty(tile.row, tile.column)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 };

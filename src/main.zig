@@ -19,12 +19,26 @@ pub fn main() !void {
     var game = try entities.Game.init(allocator);
     defer game.deinit();
 
+    var last_update_time = rl.getTime();
+
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
         defer rl.endDrawing();
 
         rl.clearBackground(colors.dark_blue);
+        if (shouldTriggerEvent(&last_update_time, 0.2)) {
+            try game.moveBlockDown();
+        }
         game.draw();
-        game.handleInput();
+        try game.handleInput();
     }
+}
+
+fn shouldTriggerEvent(last_update_time: *f64, interval: f64) bool {
+    const current_time = rl.getTime();
+    if (current_time - last_update_time.* >= interval) {
+        last_update_time.* = current_time;
+        return true;
+    }
+    return false;
 }

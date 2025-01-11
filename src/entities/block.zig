@@ -27,6 +27,18 @@ pub const Block = struct {
         self.cells.deinit();
     }
 
+    pub fn clone(self: *Block) !Block {
+        return Block{
+            .id = self.id,
+            .cells = try self.cells.clone(),
+            .cell_size = self.cell_size,
+            .rotation_state = self.rotation_state,
+            .colors = self.colors,
+            .row_offset = self.row_offset,
+            .column_offset = self.column_offset,
+        };
+    }
+
     pub fn draw(self: Block) void {
         const tiles = self.getCellPositions();
         if (self.id < self.colors.len) {
