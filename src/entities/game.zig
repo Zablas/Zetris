@@ -25,6 +25,7 @@ pub const Game = struct {
     allocator: std.mem.Allocator,
     is_game_over: bool = false,
     block_move_state: BlockMoveState = .Normal,
+    score: i32 = 0,
 
     pub fn init(allocator: std.mem.Allocator) !Game {
         var game = Game{
@@ -113,14 +114,36 @@ pub const Game = struct {
 
         if (self.block_move_state != .PrevFastFall and rl.isKeyDown(rl.KeyboardKey.down)) {
             self.block_move_state = .FastFalling;
+            self.updateScore(0, 1);
             try self.moveBlockDown();
         }
+    }
+
+    fn updateScore(self: *Game, lines_cleared: i32, move_down_points: i32) void {
+        switch (lines_cleared) {
+            1 => {
+                self.score += 100;
+            },
+            2 => {
+                self.score += 300;
+            },
+            3 => {
+                self.score += 500;
+            },
+            4 => {
+                self.score += 700;
+            },
+            else => {},
+        }
+
+        self.score += move_down_points;
     }
 
     fn reset(self: *Game) !void {
         self.deinit();
 
         self.is_game_over = false;
+        self.score = 0;
         self.block_move_state = .Normal;
         self.game_grid = grid.Grid.init();
         self.blocks = try getAllBlocks(self.allocator);
@@ -200,7 +223,8 @@ pub const Game = struct {
             self.block_move_state = .PrevFastFall;
         }
 
-        _ = self.game_grid.clearFullRows();
+        const rows_cleared = self.game_grid.clearFullRows();
+        self.updateScore(rows_cleared, 0);
     }
 
     fn blockFits(self: Game) bool {

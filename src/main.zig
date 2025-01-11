@@ -35,6 +35,18 @@ pub fn main() !void {
 
         rl.drawTextEx(font, "Score", .{ .x = 365, .y = 15 }, 38, 2, rl.Color.white);
         rl.drawRectangleRounded(.{ .x = 320, .y = 55, .height = 60, .width = 170 }, 0.3, 6, colors.light_blue);
+
+        const score = rl.textFormat("%d", .{game.score});
+        const text_size = rl.measureTextEx(font, score, 38, 2);
+        rl.drawTextEx(
+            font,
+            score,
+            .{ .x = 320 + @divFloor(170 - text_size.x, 2), .y = 65 },
+            38,
+            2,
+            rl.Color.white,
+        );
+
         rl.drawTextEx(font, "Next", .{ .x = 370, .y = 175 }, 38, 2, rl.Color.white);
         rl.drawRectangleRounded(.{ .x = 320, .y = 215, .height = 180, .width = 170 }, 0.3, 6, colors.light_blue);
         if (game.is_game_over) {
