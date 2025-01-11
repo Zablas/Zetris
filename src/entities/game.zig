@@ -91,7 +91,18 @@ pub const Game = struct {
 
     pub fn draw(self: Game) void {
         self.game_grid.draw();
-        self.current_block.draw();
+        self.current_block.draw(11, 11);
+        switch (self.next_block.id) {
+            3 => {
+                self.next_block.draw(255, 290);
+            },
+            4 => {
+                self.next_block.draw(255, 280);
+            },
+            else => {
+                self.next_block.draw(270, 270);
+            },
+        }
     }
 
     pub fn handleInput(self: *Game) !void {

@@ -39,13 +39,13 @@ pub const Block = struct {
         };
     }
 
-    pub fn draw(self: Block) void {
+    pub fn draw(self: Block, offset_x: i32, offset_y: i32) void {
         const tiles = self.getCellPositions();
         if (self.id < self.colors.len) {
             for (tiles) |tile| {
                 rl.drawRectangle(
-                    tile.column * self.cell_size + 11,
-                    tile.row * self.cell_size + 11,
+                    tile.column * self.cell_size + offset_x,
+                    tile.row * self.cell_size + offset_y,
                     self.cell_size - 1,
                     self.cell_size - 1,
                     self.colors[self.id],
