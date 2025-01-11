@@ -58,4 +58,17 @@ pub const Block = struct {
         }
         return moved_tiles;
     }
+
+    pub fn rotate(self: *Block) void {
+        self.rotation_state += 1;
+        const cell_count: i32 = @intCast(self.cells.count());
+        self.rotation_state = @mod(self.rotation_state, cell_count);
+    }
+
+    pub fn undoRotation(self: *Block) void {
+        self.rotation_state -= 1;
+        if (self.rotation_state < 0) {
+            self.rotation_state = @intCast(self.cells.count() - 1);
+        }
+    }
 };

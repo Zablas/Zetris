@@ -90,6 +90,7 @@ pub const Game = struct {
             .left => self.moveBlockLeft(),
             .right => self.moveBlockRight(),
             .down => self.moveBlockDown(),
+            .up => self.rotateBlock(),
             else => {},
         }
     }
@@ -123,5 +124,12 @@ pub const Game = struct {
             }
         }
         return false;
+    }
+
+    fn rotateBlock(self: *Game) void {
+        self.current_block.rotate();
+        if (self.isBlockOutside()) {
+            self.current_block.undoRotation();
+        }
     }
 };
