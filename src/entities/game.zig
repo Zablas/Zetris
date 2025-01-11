@@ -145,6 +145,8 @@ pub const Game = struct {
         self.current_block = try self.next_block.clone();
         self.next_block.deinit();
         self.next_block = try self.getRandomBlock();
+
+        _ = self.game_grid.clearFullRows();
     }
 
     fn blockFits(self: Game) bool {

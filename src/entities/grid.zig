@@ -50,4 +50,44 @@ pub const Grid = struct {
     pub fn isCellEmpty(self: Grid, row: i32, column: i32) bool {
         return self.grid[@intCast(row)][@intCast(column)] == 0;
     }
+
+    pub fn clearFullRows(self: *Grid) i32 {
+        var completed: i32 = 0;
+
+        var row = self.rows - 1;
+        while (row >= 0) : (row -= 1) {
+            if (self.isRowFull(row)) {
+                self.clearRow(row);
+                completed += 1;
+            } else if (completed > 0) {
+                self.moveRowDown(row, completed);
+            }
+        }
+
+        return completed;
+    }
+
+    fn isRowFull(self: Grid, row: i32) bool {
+        for (self.grid[@intCast(row)]) |col| {
+            if (col == 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    fn clearRow(self: *Grid, row: i32) void {
+        for (&self.grid[@intCast(row)]) |*col| {
+            col.* = 0;
+        }
+    }
+
+    fn moveRowDown(self: *Grid, row: i32, num_rows: i32) void {
+        const cols: usize = @intCast(self.cols);
+        for (0..cols) |i| {
+            self.grid[@intCast(row + num_rows)][i] = self.grid[@intCast(row)][i];
+            self.grid[@intCast(row)][i] = 0;
+        }
+    }
 };
