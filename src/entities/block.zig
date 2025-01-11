@@ -44,8 +44,8 @@ pub const Block = struct {
         if (self.id < self.colors.len) {
             for (tiles) |tile| {
                 rl.drawRectangle(
-                    tile.column * self.cell_size + 1,
-                    tile.row * self.cell_size + 1,
+                    tile.column * self.cell_size + 11,
+                    tile.row * self.cell_size + 11,
                     self.cell_size - 1,
                     self.cell_size - 1,
                     self.colors[self.id],

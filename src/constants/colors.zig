@@ -9,6 +9,7 @@ pub const yellow = rl.Color{ .r = 237, .g = 234, .b = 4, .a = 255 };
 pub const purple = rl.Color{ .r = 166, .g = 0, .b = 247, .a = 255 };
 pub const cyan = rl.Color{ .r = 21, .g = 204, .b = 209, .a = 255 };
 pub const blue = rl.Color{ .r = 13, .g = 64, .b = 216, .a = 255 };
+pub const light_blue = rl.Color{ .r = 59, .g = 85, .b = 162, .a = 255 };
 
 pub fn getAllColors() [8]rl.Color {
     return [8]rl.Color{

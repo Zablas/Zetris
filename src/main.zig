@@ -6,11 +6,14 @@ const entities = @import("entities");
 const colors = constants.colors;
 
 pub fn main() !void {
-    rl.initWindow(300, 600, "Zetris");
+    rl.initWindow(500, 620, "Zetris");
     defer rl.closeWindow();
 
     rl.setTargetFPS(60);
     rl.setExitKey(rl.KeyboardKey.null);
+
+    const font = rl.loadFontEx("assets/fonts/monogram.ttf", 64, null);
+    defer rl.unloadFont(font);
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -29,6 +32,15 @@ pub fn main() !void {
         if (shouldTriggerEvent(&last_update_time, 0.2)) {
             try game.moveBlockDown();
         }
+
+        rl.drawTextEx(font, "Score", .{ .x = 365, .y = 15 }, 38, 2, rl.Color.white);
+        rl.drawRectangleRounded(.{ .x = 320, .y = 55, .height = 60, .width = 170 }, 0.3, 6, colors.light_blue);
+        rl.drawTextEx(font, "Next", .{ .x = 370, .y = 175 }, 38, 2, rl.Color.white);
+        rl.drawRectangleRounded(.{ .x = 320, .y = 215, .height = 180, .width = 170 }, 0.3, 6, colors.light_blue);
+        if (game.is_game_over) {
+            rl.drawTextEx(font, "GAME OVER", .{ .x = 320, .y = 450 }, 38, 2, rl.Color.white);
+        }
+
         game.draw();
         try game.handleInput();
     }

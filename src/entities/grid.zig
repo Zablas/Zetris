@@ -21,8 +21,8 @@ pub const Grid = struct {
             for (row, 0..) |cell, j| {
                 if (cell < self.colors.len) {
                     rl.drawRectangle(
-                        @intCast(j * self.cell_size + 1),
-                        @intCast(i * self.cell_size + 1),
+                        @intCast(j * self.cell_size + 11),
+                        @intCast(i * self.cell_size + 11),
                         @intCast(self.cell_size - 1),
                         @intCast(self.cell_size - 1),
                         self.colors[cell],
