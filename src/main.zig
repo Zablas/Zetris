@@ -28,6 +28,10 @@ pub fn main() !void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
+        if (rl.isMusicValid(game.music)) {
+            rl.updateMusicStream(game.music);
+        }
+
         rl.clearBackground(colors.dark_blue);
         if (shouldTriggerEvent(&last_update_time, 0.2)) {
             try game.moveBlockDown();

@@ -26,13 +26,25 @@ pub const Game = struct {
     is_game_over: bool = false,
     block_move_state: BlockMoveState = .Normal,
     score: i32 = 0,
+    music: rl.Music,
+    clear_sound: rl.Sound,
+    rotate_sound: rl.Sound,
 
     pub fn init(allocator: std.mem.Allocator) !Game {
+        rl.initAudioDevice();
+
         var game = Game{
             .game_grid = grid.Grid.init(),
             .blocks = try getAllBlocks(allocator),
             .allocator = allocator,
+            .music = rl.loadMusicStream("assets/audio/music.mp3"),
+            .rotate_sound = rl.loadSound("assets/audio/rotate.mp3"),
+            .clear_sound = rl.loadSound("assets/audio/clear.mp3"),
         };
+
+        if (rl.isMusicValid(game.music)) {
+            rl.playMusicStream(game.music);
+        }
 
         game.current_block = try game.getRandomBlock();
         game.next_block = try game.getRandomBlock();
@@ -41,6 +53,14 @@ pub const Game = struct {
     }
 
     pub fn deinit(self: *Game) void {
+        self.free_memory();
+        rl.unloadMusicStream(self.music);
+        rl.unloadSound(self.rotate_sound);
+        rl.unloadSound(self.clear_sound);
+        rl.closeAudioDevice();
+    }
+
+    fn free_memory(self: *Game) void {
         for (self.blocks.items) |*_block| {
             _block.deinit();
         }
@@ -151,7 +171,7 @@ pub const Game = struct {
     }
 
     fn reset(self: *Game) !void {
-        self.deinit();
+        self.free_memory();
 
         self.is_game_over = false;
         self.score = 0;
@@ -215,6 +235,8 @@ pub const Game = struct {
         self.current_block.rotate();
         if (self.isBlockOutside() or !self.blockFits()) {
             self.current_block.undoRotation();
+        } else if (rl.isSoundValid(self.rotate_sound)) {
+            rl.playSound(self.rotate_sound);
         }
     }
 
@@ -235,7 +257,10 @@ pub const Game = struct {
         }
 
         const rows_cleared = self.game_grid.clearFullRows();
-        self.updateScore(rows_cleared, 0);
+        if (rows_cleared > 0 and rl.isSoundValid(self.clear_sound)) {
+            rl.playSound(self.clear_sound);
+            self.updateScore(rows_cleared, 0);
+        }
     }
 
     fn blockFits(self: Game) bool {
